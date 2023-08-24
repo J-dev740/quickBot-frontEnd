@@ -3,11 +3,17 @@ import Node from './Node/Node';
 import {dijkstra, getNodesInShortestPathOrder} from '../algorithms/dijkstra';
 
 import './PathfindingVisualizer.css';
+// import { error } from 'highcharts';
 
-const START_NODE_ROW = 10;
-const START_NODE_COL = 15;
-const FINISH_NODE_ROW = 10;
-const FINISH_NODE_COL = 35;
+// const START_NODE_ROW = 10;
+// const START_NODE_COL = 15;
+// const FINISH_NODE_ROW = 10;
+// const FINISH_NODE_COL = 35;
+const START_NODE_ROW = 0;
+const START_NODE_COL = 0;
+const FINISH_NODE_ROW = 5;
+const FINISH_NODE_COL = 5;
+
 
 export default class PathfindingVisualizer extends Component {
   constructor() {
@@ -44,6 +50,8 @@ export default class PathfindingVisualizer extends Component {
         setTimeout(() => {
           this.animateShortestPath(nodesInShortestPathOrder);
         }, 10 * i);
+        // console.log(nodesInShortestPathOrder);
+
         return;
       }
       setTimeout(() => {
@@ -62,6 +70,7 @@ export default class PathfindingVisualizer extends Component {
           'node node-shortest-path';
       }, 50 * i);
     }
+
   }
 
   visualizeDijkstra() {
@@ -70,7 +79,33 @@ export default class PathfindingVisualizer extends Component {
     const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
     const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
     const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+
+        async function sendData() {
+          const filtered_data=nodesInShortestPathOrder.map(function(item) {
+            return [item.row,item.col];
+        });
+       await fetch('http://192.168.178.1:5000/send-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(filtered_data),
+        
+      })
+        .then(response => {
+          console.log(response);
+        });
+        // .catch(err => {
+        //   console.log(err);
+        // });
+        console.log("hello world");
+    }
+  
+    sendData();
     this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder);
+
+    
+    
   }
 
   render() {
@@ -81,6 +116,7 @@ export default class PathfindingVisualizer extends Component {
         <button onClick={() => this.visualizeDijkstra()}>
           Visualize Dijkstra's Algorithm
         </button>
+        
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
@@ -114,9 +150,9 @@ export default class PathfindingVisualizer extends Component {
 
 const getInitialGrid = () => {
   const grid = [];
-  for (let row = 0; row < 20; row++) {
+  for (let row = 0; row < 6; row++) {
     const currentRow = [];
-    for (let col = 0; col < 50; col++) {
+    for (let col = 0; col < 6; col++) {
       currentRow.push(createNode(col, row));
     }
     grid.push(currentRow);
